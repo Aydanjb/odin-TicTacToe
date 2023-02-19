@@ -1,0 +1,10 @@
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.startBtn {
+  display: block;
+  max-width: 160px;
+}
