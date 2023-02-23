@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-plusplus */
 /* eslint-disable no-bitwise */
 // Represents and manages the board
 const gameBoard = (() => {
@@ -19,20 +21,20 @@ const gameBoard = (() => {
     0b010_010_010,
     0b100_100_100, // 3 columns
     0b100_010_001,
-    0b001_010_100  // 2 diagonals
-  ]
+    0b001_010_100, // 2 diagonals
+  ];
 
-  const updateBoard = (square) => 1 << square
+  const updateBoard = (square) => 1 << square;
   const checkIfIllegal = (move) => {
     if (xBoard & move || oBoard & move) {
       console.log("Invalid Move!");
       return false;
     }
-  }
+  };
   const resetBoard = () => {
     xBoard = 0b000_000_000;
     oBoard = 0b000_000_000;
-  }
+  };
 
   // TODO: Make sure placeToken() does not work when square is already filled.
   const placeToken = (square, player) => {
@@ -44,12 +46,11 @@ const gameBoard = (() => {
     if (player === "X") {
       xBoard |= board;
       console.log(xBoard);
-    }
-    else if (player === "O") {
+    } else if (player === "O") {
       oBoard |= board;
       console.log(oBoard);
     }
-  }
+  };
 
   const printBoard = () => {
     for (let i = 0; i < rows; i++) {
@@ -71,7 +72,7 @@ const gameBoard = (() => {
       console.log(row.join(""));
     }
     console.log("|---|---|---|");
-  }
+  };
 
   // Check if a player has won
   const checkWin = () => {
@@ -90,7 +91,7 @@ const gameBoard = (() => {
       }
     }
     return false;
-  }
+  };
 
   // Check if game is drawn
   const checkDraw = () => {
@@ -100,14 +101,14 @@ const gameBoard = (() => {
       return true;
     }
     return false;
-  }
+  };
 
   return {
     placeToken,
     printBoard,
     checkWin,
-    checkDraw
-  }
+    checkDraw,
+  };
 })();
 
 const gameController = (() => {
@@ -119,35 +120,40 @@ const gameController = (() => {
   const swapTurn = () => {
     if (currentPlayer === player1) {
       currentPlayer = player2;
-    }
-    else {
+    } else {
       currentPlayer = player1;
     }
-  }
+  };
 
   const getCurrentPlayer = () => currentPlayer;
 
   const printNewRound = () => {
     gameBoard.printBoard();
     console.log(`${getCurrentPlayer()}'s Turn.`);
-  }
+  };
 
   // Potential Squares: 0, 1, 2, 3, 4, 5, 6, 7, 8
   const playRound = (square) => {
     if (gameBoard.placeToken(square, getCurrentPlayer()) === false) {
       printNewRound();
-      return
+      return;
     }
     gameBoard.checkWin();
     gameBoard.checkDraw();
     swapTurn();
     printNewRound();
-  }
+  };
 
   return {
     printNewRound,
-    playRound
-  }
+    playRound,
+  };
+})();
+
+const screenController = (() => {
+  const boardDiv = document.querySelector(".board");
+
+  return {};
 })();
 
 gameController.printNewRound();
