@@ -151,9 +151,19 @@ const gameController = (() => {
 })();
 
 const screenController = (() => {
-  const boardDiv = document.querySelector(".board");
-
-  return {};
+  const board = document.querySelector(".board");
+  
+  const drawBoard = () => {
+    for(let i = 0; i < 9; i += 1) {
+      const square = document.createElement("div");
+      square.classList.add([i])
+      board.appendChild(square);
+    }
+  }
+  
+  return {
+    drawBoard
+  };
 })();
 
-gameController.printNewRound();
+screenController.drawBoard();
