@@ -15,6 +15,10 @@ main {
   align-items: center;
 }
 
+.turn-tracker {
+  font-size: 24px;
+}
+
 .board {
   height: 450px;
   width: 450px;
@@ -31,4 +35,8 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.board div:hover {
+  background-color: #008b93;
 }

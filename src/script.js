@@ -1,12 +1,9 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable consistent-return */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-bitwise */
 // Represents and manages the board
 const gameBoard = (() => {
-  // Board dimensions
-  const rows = 3;
-  const columns = 3;
-
   // Bit strings for player 1 and 2 and draw game
   let xBoard = 0b000_000_000;
   let oBoard = 0b000_000_000;
@@ -31,62 +28,34 @@ const gameBoard = (() => {
       return false;
     }
   };
-  const resetBoard = () => {
+
+  /*  const resetBoard = () => {
     xBoard = 0b000_000_000;
     oBoard = 0b000_000_000;
   };
-
+  */
+ 
   // TODO: Make sure placeToken() does not work when square is already filled.
   const placeToken = (square, player) => {
     const board = updateBoard(square);
-    console.log(board);
     if (checkIfIllegal(board) === false) {
       return false;
     }
     if (player === "X") {
       xBoard |= board;
-      console.log(xBoard);
     } else if (player === "O") {
       oBoard |= board;
       console.log(oBoard);
     }
   };
 
-  const printBoard = () => {
-    for (let i = 0; i < rows; i++) {
-      const row = ["|"];
-      for (let j = 0; j < columns; j++) {
-        const boardMask = updateBoard(i + j * rows);
-
-        if (xBoard & boardMask) {
-          row.push("X");
-        }
-
-        if (oBoard & boardMask) {
-          row.push("O");
-        }
-
-        row.push("  |");
-      }
-      console.log("|---|---|---|");
-      console.log(row.join(""));
-    }
-    console.log("|---|---|---|");
-  };
-
   // Check if a player has won
   const checkWin = () => {
     for (let i = 0; i < winningBoards.length; i++) {
       if ((xBoard & winningBoards[i]) === winningBoards[i]) {
-        printBoard();
-        console.log("X Wins!");
-        resetBoard();
         return true;
       }
       if ((oBoard & winningBoards[i]) === winningBoards[i]) {
-        printBoard();
-        console.log("O Wins!");
-        resetBoard();
         return true;
       }
     }
@@ -96,18 +65,20 @@ const gameBoard = (() => {
   // Check if game is drawn
   const checkDraw = () => {
     if (((xBoard | oBoard) & fullBoard) === fullBoard) {
-      console.log("It's a draw!");
-      resetBoard();
-      return true;
+      return "draw";
     }
     return false;
   };
 
+  const getXBoard = () => xBoard;
+  const getOBoard = () => oBoard;
+
   return {
     placeToken,
-    printBoard,
     checkWin,
     checkDraw,
+    getXBoard,
+    getOBoard,
   };
 })();
 
@@ -127,43 +98,62 @@ const gameController = (() => {
 
   const getCurrentPlayer = () => currentPlayer;
 
-  const printNewRound = () => {
-    gameBoard.printBoard();
-    console.log(`${getCurrentPlayer()}'s Turn.`);
-  };
-
   // Potential Squares: 0, 1, 2, 3, 4, 5, 6, 7, 8
   const playRound = (square) => {
     if (gameBoard.placeToken(square, getCurrentPlayer()) === false) {
-      printNewRound();
       return;
     }
-    gameBoard.checkWin();
-    gameBoard.checkDraw();
-    swapTurn();
-    printNewRound();
-  };
-
-  return {
-    printNewRound,
-    playRound,
-  };
-})();
-
-const screenController = (() => {
-  const board = document.querySelector(".board");
-  
-  const drawBoard = () => {
-    for(let i = 0; i < 9; i += 1) {
-      const square = document.createElement("div");
-      square.classList.add([i])
-      board.appendChild(square);
+    if (gameBoard.checkWin()) {
+      return true;
     }
-  }
-  
+    if (gameBoard.checkDraw() === "draw") {
+      return "draw";
+    }
+    swapTurn();
+  };
+
   return {
-    drawBoard
+    playRound,
+    getCurrentPlayer,
   };
 })();
 
-screenController.drawBoard();
+const screenController = () => {
+  const boardDiv = document.querySelector(".board");
+  const turnDiv = document.querySelector(".turn-tracker");
+
+  const drawBoard = () => {
+    // eslint-disable-next-line prefer-const
+    let currentPlayer = gameController.getCurrentPlayer();
+
+    turnDiv.textContent = `${currentPlayer}'s turn`;
+
+    for (let i = 0; i < 9; i += 1) {
+      const square = document.createElement("div");
+      square.classList.add([i]);
+      boardDiv.appendChild(square);
+    }
+
+    const squares = Array.from(boardDiv.children);
+    squares.forEach((element) => {
+      element.addEventListener("click", () => {
+        const playRound = gameController.playRound(element.className);
+        if (playRound === true) {
+          turnDiv.textContent = `${currentPlayer} Wins!`;
+          element.textContent = currentPlayer;
+        } else if (playRound === "draw") {
+          turnDiv.textContent = "It's a draw!";
+          element.textContent = currentPlayer;
+        } else {
+          element.textContent = currentPlayer;
+          currentPlayer = gameController.getCurrentPlayer();
+          turnDiv.textContent = `${currentPlayer}'s turn`;
+        }
+      });
+    });
+  };
+
+  drawBoard();
+};
+
+screenController();
